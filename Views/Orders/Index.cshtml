@@ -1,0 +1,137 @@
+﻿@model IEnumerable<wekdi.Models.Order>
+@{
+    ViewData["Title"] = "Orders";
+    Layout = "AdminSidebar";
+}
+
+<h2>Orders</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<form asp-action="Index" method="get" class="row g-3 mb-3">
+
+    <!-- 🔍 Search -->
+    <div class="col-md-4">
+        <label for="search" class="form-label">Search by Member ID or Name</label>
+        <input type="text" id="search" name="search"
+               class="form-control" value="@ViewBag.Search" placeholder="e.g. 12 or alice" />
+    </div>
+
+    <!-- 📅 Date range -->
+    <div class="col-auto">
+        <label for="startDate" class="form-label">From</label>
+        <input type="date" id="startDate" name="startDate"
+               class="form-control" value="@ViewBag.StartDate" />
+    </div>
+    <div class="col-auto">
+        <label for="endDate" class="form-label">To</label>
+        <input type="date" id="endDate" name="endDate"
+               class="form-control" value="@ViewBag.EndDate" />
+    </div>
+
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="Index" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+<div class="text-danger">
+    @Html.ValidationSummary(false)
+</div>
+
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Order #</th>
+            <th>Member</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderId</td>
+                <td>@order.Member?.Username</td>
+                <td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@order.TotalAmount.ToString("C")</td>
+                <td>@order.Status</td>
+                <td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@order.OrderId"
+                       class="btn btn-sm btn-info">Details</a>
+
+                    <a asp-action="Delete" asp-route-id="@order.OrderId"
+                       class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var search     = ViewBag.Search     ?? "";
+    var startDate  = ViewBag.StartDate  ?? "";
+    var endDate    = ViewBag.EndDate    ?? "";
+    int current    = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+<nav aria-label="Order pages" class="mt-4">
+    <ul class="pagination justify-content-center">
+
+        <!-- Previous -->
+        <li class="page-item @(current <= 1 ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("Index", new {
+                        page = current - 1,
+                        search = search,
+                        startDate = startDate,
+                        endDate = endDate
+                    })">
+                Previous
+            </a>
+        </li>
+
+        <!-- Page numbers -->
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == current ? "active" : "")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new {
+                            page = i,
+                            search = search,
+                            startDate = startDate,
+                            endDate = endDate
+                        })">
+                    @i
+                </a>
+            </li>
+        }
+
+        <!-- Next -->
+        <li class="page-item @(current >= totalPages ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("Index", new {
+                        page = current + 1,
+                        search = search,
+                        startDate = startDate,
+                        endDate = endDate
+                    })">
+                Next
+            </a>
+        </li>
+    </ul>
+</nav>

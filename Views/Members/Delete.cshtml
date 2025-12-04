@@ -1,0 +1,32 @@
+﻿@model wekdi.Models.Member
+
+@{
+    Layout = "AdminSidebar";
+    ViewData["Title"] = "Delete Member";
+}
+
+<h2>Delete Member</h2>
+
+<div class="alert alert-warning">
+    <strong>Warning:</strong> You are about to delete this member. This action cannot be undone.
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Username</h5>
+        <p class="card-text">
+            <strong>Full Name:</strong> @Model.FullName <br />
+            <strong>Email:</strong> @Model.Email <br />
+            <strong>Phone:</strong> @Model.Phone <br />
+            <strong>Address:</strong> @Model.Address
+        </p>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="MemberId" />
+    <div class="mb-3">
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

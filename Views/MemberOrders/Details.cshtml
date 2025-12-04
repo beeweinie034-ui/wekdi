@@ -1,0 +1,123 @@
+﻿@model wekdi.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+    var orderItems = ViewBag.OrderItems as List<wekdi.Models.OrderItem>;
+}
+
+<!-- === Embedded McDonald's System CSS === -->
+<style>
+    body {
+        background-color: #fff8f0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    h2 {
+        color: #d32300; /* McDonald's red */
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    p strong {
+        color: #333;
+    }
+
+    /* Back button */
+    .btn-secondary {
+        background-color: #d32300;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        transition: background-color .2s;
+    }
+
+        .btn-secondary:hover {
+            background-color: #b71c00;
+        }
+
+    /* Table styling */
+    table.table {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    table thead {
+        background-color: #ffd100; /* golden yellow header */
+        color: #000;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    table tbody tr:hover {
+        background-color: #fff2cc; /* light yellow highlight */
+    }
+
+    /* Product cell */
+    td.d-flex span {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .img-thumbnail {
+        border: 2px solid #ffd100;
+        padding: 2px;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    tfoot td {
+        background-color: #fff3d0;
+        font-weight: 700;
+    }
+</style>
+
+<h2>Order #@Model.OrderId Details</h2>
+<p><strong>Order Date:</strong> @Model.OrderDate.ToString("dd MMM yyyy")</p>
+<p><strong>Status:</strong> @Model.Status</p>
+
+@if (orderItems == null || !orderItems.Any())
+{
+    <p>No items found for this order.</p>
+}
+else
+{
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in orderItems)
+            {
+                <tr>
+                    <td class="d-flex align-items-center">
+                        <img src="@Url.Content(item.Product?.ImagePath != null
+                                                                                 ? "/images/products/" + item.Product.ImagePath
+                                                                                 : "/images/products/default.png")"
+                     style="height:150px;width:auto;object-fit:cover;margin-right:10px;"
+                     class="img-thumbnail" />
+                <span>@item.Product?.Name</span>
+            </td>
+            <td>@item.Quantity</td>
+            <td>RM @item.Price.ToString("N2")</td>
+            <td>RM @( (item.Quantity * item.Price).ToString("N2") )</td>
+        </tr>
+                }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td><strong>RM @Model.TotalAmount.ToString("N2")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+}
+
+<a asp-action="OrderHistory" class="btn btn-secondary">⟵ Back to Order History</a>

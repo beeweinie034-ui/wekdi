@@ -1,0 +1,79 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="d-flex">
+    <!-- 📋 Sidebar -->
+    <nav class="admin-sidebar">
+        <h5 class="mb-4">Admin Dashboard</h5>
+
+        <ul class="nav nav-pills flex-column mb-auto gap-2">
+            <li class="nav-item">
+                <a class="nav-link link-dark" asp-controller="Reports" asp-action="TopProducts">
+                    📊 Top Products
+                </a>
+            </li>
+
+            <li class="nav-item">
+                @if (User.IsInRole("SuperAdmin"))
+                {
+                    <a class="nav-link link-dark" asp-controller="Admins" asp-action="Index">
+                        Admin Accounts
+                    </a>
+                }
+                else
+                {
+                    <a class="nav-link link-secondary disabled" href="#" onclick="showRoleAlert()">
+                        Admin Accounts
+                    </a>
+                }
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link link-dark" asp-controller="Members" asp-action="Index">Members Accounts</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-dark" asp-controller="Categories" asp-action="Index">Categories</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-dark" asp-controller="Products" asp-action="Index">Products</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-dark" asp-controller="Orders" asp-action="Index">Orders</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 🖼️ Page Content -->
+    <div class="flex-grow-1 p-4">
+        @RenderBody()
+    </div>
+
+    <!-- ✅ Toast container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <script>
+        function showRoleAlert() {
+            const toastContainer = document.querySelector(".toast-container");
+
+            const toast = document.createElement("div");
+            toast.className = "toast align-items-center text-bg-danger border-0 show";
+            toast.setAttribute("role", "alert");
+            toast.setAttribute("aria-live", "assertive");
+            toast.setAttribute("aria-atomic", "true");
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">Only SuperAdmin can access Admin Accounts!</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>`;
+
+            toastContainer.appendChild(toast);
+
+            // Remove after 4 seconds
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+</div>

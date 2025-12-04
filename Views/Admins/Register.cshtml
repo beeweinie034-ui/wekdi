@@ -1,0 +1,49 @@
+﻿@model wekdi.Models.Admin
+@{
+    ViewData["Title"] = "Register Admin";
+}
+
+<h2>Register Admin</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-action="Register" method="post" class="col-md-6">
+    <div class="mb-3">
+        <label asp-for="Username" class="form-label"></label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label"></label>
+        <input asp-for="Role" class="form-control" readonly value="StaffAdmin" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required minlength="6" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" name="confirmPassword" class="form-control" required minlength="6" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+    <a asp-action="Login" asp-controller="Account" class="btn btn-secondary">Back to Login</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

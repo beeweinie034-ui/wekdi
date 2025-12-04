@@ -1,0 +1,182 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    /* Bigger form container ONLY */
+    .login-wrapper {
+        max-width: 600px; /* ⬆ wider than before (was 450px) */
+        width: 100%;
+        background: #ffffff;
+        border-radius: 1rem;
+        padding: 3rem 3rem 2.5rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        margin: 3rem auto; /* center it without affecting nav/footer */
+        text-align: center;
+    }
+
+        .login-wrapper h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #d32f2f;
+        }
+
+        .login-wrapper form {
+            text-align: left;
+        }
+
+        .login-wrapper .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .login-wrapper .form-control {
+            border-radius: 30px;
+            padding: 0.9rem 1rem; /* slightly taller inputs */
+            font-size: 1.1rem;
+        }
+
+    .input-group .btn-outline-secondary {
+        border-radius: 30px;
+        font-size: 0.95rem;
+    }
+
+    #loginBtn,
+    .btn-primary {
+        background-color: #d32f2f;
+        border: none;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 0.8rem 1.4rem; /* larger button */
+        font-size: 1.1rem;
+        transition: background .2s;
+    }
+
+        #loginBtn:hover,
+        .btn-primary:hover {
+            background-color: #b71c1c;
+        }
+
+    .btn-secondary {
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.7rem 1.4rem;
+    }
+
+    .text-decoration-none {
+        color: #d32f2f;
+        font-weight: 600;
+    }
+
+        .text-decoration-none:hover {
+            text-decoration: underline;
+        }
+
+    .g-recaptcha {
+        margin: 1rem 0;
+    }
+</style>
+
+<div class="login-wrapper">
+    <h2>Login</h2>
+
+    @if (ViewBag.LockoutEnd != null)
+    {
+        <div class="alert alert-warning">
+            Your account is locked. Please wait
+            <span id="countdown"></span> before trying again.
+        </div>
+
+        <script>
+            window.onload = function() {
+                const lockoutEnd = new Date('@ViewBag.LockoutEnd.ToString("yyyy-MM-ddTHH:mm:ss")');
+                const loginBtn = document.getElementById("loginBtn");
+                loginBtn.disabled = true;
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = lockoutEnd - now;
+
+                    if (diff <= 0) {
+                        document.getElementById("countdown").innerText = "You can now try again.";
+                        loginBtn.disabled = false;
+                        return;
+                    }
+
+                    const seconds = Math.floor(diff / 1000);
+                    document.getElementById("countdown").innerText = seconds + " seconds";
+                    setTimeout(updateCountdown, 1000);
+                }
+
+                updateCountdown();
+            };
+        </script>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form asp-action="Login" method="post" class="mx-auto">
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input name="username" class="form-control" required />
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+                <input type="password" name="password" id="LoginPassword" class="form-control" required minlength="6" />
+                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('LoginPassword', this)">
+                    Shown
+                </button>
+            </div>
+        </div>
+
+        <div class="g-recaptcha" data-sitekey="6Ldz4dErAAAAAIZl9LOYiohJxP8kxZjcv8wLQV-z"></div>
+        <input type="hidden" name="gRecaptchaToken" id="gRecaptchaToken" />
+
+        <button type="submit" id="loginBtn" class="btn btn-primary w-100 mb-2">Login</button>
+        <a asp-action="Register" class="btn btn-secondary w-100 mb-3">Register as new member</a>
+
+        <div class="mt-2">
+            <a asp-action="ForgotPassword" class="text-decoration-none">Forgot Password?</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js?render=6Ldz4dErAAAAAIZl9LOYiohJxP8kxZjcv8wLQV-z"></script>
+
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.textContent = "Hidden";
+            } else {
+                input.type = "password";
+                btn.textContent = "Shown";
+            }
+        }
+
+        grecaptcha.ready(function() {
+            document.querySelector("form").addEventListener("submit", function(e) {
+                e.preventDefault();
+                grecaptcha.execute('6Ldz4dErAAAAAIZl9LOYiohJxP8kxZjcv8wLQV-z', { action: 'submit' }).then(function(token) {
+                    document.getElementById("gRecaptchaToken").value = token;
+                    e.target.submit();
+                });
+            });
+        });
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,21 @@
+﻿@{
+    Layout = "_Layout"; // still reuse the top navbar
+}
+
+<div class="d-flex">
+    <!-- 📋 Sidebar -->
+    <div class="bg-light border-end p-3" style="width:220px;">
+        <h5>Menu</h5>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" asp-controller="Category" asp-action="Index">Category</a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index">Products</a></li>
+
+        </ul>
+    </div>
+
+    <!-- 🖼️ Page Content -->
+    <div class="flex-grow-1 p-4">
+        @RenderBody()
+    </div>
+</div>
+

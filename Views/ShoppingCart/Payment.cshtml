@@ -1,0 +1,181 @@
+﻿@model wekdi.Models.PaymentViewModel
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<!-- === McDonald's Theme CSS === -->
+<style>
+    body {
+        background-color: #fff8f0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    h2 {
+        color: #d32300; /* McDonald's red */
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    h4, .fw-bold {
+        color: #000;
+        font-weight: 600;
+    }
+
+    /* Table */
+    table.table {
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        table.table thead {
+            background-color: #ffd100; /* McDonald's yellow */
+            color: #000;
+            font-weight: 600;
+        }
+
+        table.table td {
+            vertical-align: middle;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #ffd100;
+        border: none;
+        color: #000;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        transition: background-color .2s;
+    }
+
+        .btn-primary:hover {
+            background-color: #e6c400;
+        }
+
+    .btn-success {
+        background-color: #d32300;
+        border: none;
+        font-weight: 600;
+        border-radius: 25px;
+        padding: 0.6rem 1.8rem;
+        transition: background-color .2s;
+    }
+
+        .btn-success:hover {
+            background-color: #b71c00;
+        }
+
+    /* Form fields */
+    .form-control {
+        border: 2px solid #ffd100;
+        border-radius: 8px;
+    }
+
+        .form-control:focus {
+            border-color: #d32300;
+            box-shadow: 0 0 0 0.2rem rgba(211,35,0,.25);
+        }
+
+    label.form-label.fw-bold {
+        color: #d32300;
+    }
+</style>
+
+<h2>Payment</h2>
+
+<!-- Order details -->
+<div class="mb-4">
+    <h4 class="fw-bold">Order Details</h4>
+    <p><strong>Order Type:</strong> @Model.OrderType</p>
+    @if (Model.OrderType == "Dine In" && Model.TableNumber.HasValue)
+    {
+        <p><strong>Table Number:</strong> @Model.TableNumber</p>
+    }
+</div>
+
+<!-- Item list -->
+<table class="table table-sm table-bordered align-middle shadow-sm">
+    <thead>
+        <tr>
+            <th style="width:40%">Item</th>
+            <th class="text-center" style="width:10%">Qty</th>
+            <th class="text-end" style="width:15%">Price</th>
+            <th class="text-end" style="width:15%">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td class="d-flex align-items-center">
+                    <img src="~/images/products/@item.Product!.ImagePath"
+                         alt="@item.Product.Name"
+                         class="me-2"
+                         style="width:50px;height:50px;object-fit:cover;border-radius:6px;" />
+                    <span>@item.Product.Name</span>
+                </td>
+                <td class="text-center">@item.Quantity</td>
+                <td class="text-end">@item.Product.Price.ToString("C")</td>
+                <td class="text-end">@((item.Quantity * item.Product.Price).ToString("C"))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Totals -->
+<div class="mt-3">
+    <p><strong>Subtotal:</strong> @ViewBag.Subtotal.ToString("C")</p>
+    @if (Model.TaxRate > 0)
+    {
+        <p><strong>Tax (@(Model.TaxRate * 100) %):</strong> @ViewBag.Tax.ToString("C")</p>
+    }
+    <h4><strong>Grand Total:</strong> @ViewBag.GrandTotal.ToString("C")</h4>
+</div>
+
+<hr />
+
+<!-- E-Receipt -->
+<form asp-action="DownloadReceipt" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="TaxRate" value="@Model.TaxRate" />
+    <input type="hidden" name="OrderType" value="@Model.OrderType" />
+    <input type="hidden" name="TableNumber" value="@Model.TableNumber" />
+    <button type="submit" class="btn btn-primary">
+        Download E-Receipt
+    </button>
+</form>
+
+<hr />
+
+<!-- Payment form -->
+<form asp-action="ProcessPayment" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="TaxRate" value="@Model.TaxRate" />
+    <input type="hidden" name="OrderType" value="@Model.OrderType" />
+    <input type="hidden" name="TableNumber" value="@Model.TableNumber" />
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Name on Card</label>
+        <input asp-for="CardName" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Card Number</label>
+        <input asp-for="CardNumber" class="form-control" maxlength="19" required />
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Expiry (MM/YY)</label>
+            <input asp-for="Expiry" class="form-control" placeholder="MM/YY" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">CVV</label>
+            <input asp-for="CVV" class="form-control" maxlength="4" required />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg">
+        Pay @ViewBag.GrandTotal.ToString("C")
+    </button>
+</form>

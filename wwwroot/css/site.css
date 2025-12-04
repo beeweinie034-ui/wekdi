@@ -1,0 +1,113 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.hero-section {
+    position: relative;
+    height: 800px; /* shorter = rectangle banner */
+    border-radius: 15px;
+    background: url('/images/products/home.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+/* Dark overlay for better text readability */
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-section .hero-content {
+    position: relative;
+    margin-top: -350px; /* moves text up */
+    text-align: center;
+    z-index: 2;
+}
+
+.hero-section .btn-warning {
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease-in-out;
+}
+
+.hero-section .btn-warning:hover {
+    background-color: #ffcc00;
+    color: black;
+}
+
+/* Remove extra padding/margin from the sidebar */
+.admin-sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+/* Remove list default styles */
+.admin-sidebar ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+/* Remove link inner padding if needed */
+.admin-sidebar .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    margin: 0; /* remove extra margin */
+}
+
+    /* Optional: remove border-radius on hover */
+    .admin-sidebar .nav-link:hover {
+        border-radius: 0;
+        background-color: #e9ecef;
+    }
+
+/* Remove nav-item extra spacing */
+.admin-sidebar .nav-item {
+    margin-bottom: 0;
+}
+
+
+/* Responsive: collapse sidebar on small screens */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+    }
+}
+
+

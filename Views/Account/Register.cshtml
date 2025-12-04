@@ -1,0 +1,193 @@
+﻿@model wekdi.Models.Member
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    /* 🔒 Centered, wider register box only */
+    .register-wrapper {
+        max-width: 650px; /* wider than the default */
+        width: 100%;
+        margin: 3rem auto;
+        padding: 3rem 3rem 2.5rem;
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+        .register-wrapper h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d32f2f;
+            margin-bottom: 1.5rem;
+        }
+
+        .register-wrapper form {
+            text-align: left;
+        }
+
+        .register-wrapper .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .register-wrapper .form-control {
+            border-radius: 30px;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+        }
+
+    .input-group .btn-outline-secondary {
+        border-radius: 30px;
+        font-size: 0.95rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #d32f2f;
+        border: none;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 0.8rem 1.4rem;
+        font-size: 1.1rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background-color: #b71c1c;
+        }
+
+    .btn-secondary {
+        border-radius: 30px;
+        font-weight: 600;
+        padding: 0.7rem 1.4rem;
+    }
+
+    /* Password strength bar */
+    .progress {
+        height: 0.6rem;
+        border-radius: 0.5rem;
+        background-color: #eee;
+        margin-top: 0.5rem;
+    }
+
+    #passwordStrengthText {
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+    }
+
+    .g-recaptcha {
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="register-wrapper">
+    <h2>Register as Member</h2>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form asp-action="Register" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label">Username</label>
+            <input asp-for="Username" class="form-control" required minlength="3" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" required />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label asp-for="Password" class="form-label">Password</label>
+            <div class="input-group">
+                <input asp-for="Password" id="Password" class="form-control" type="password" />
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('Password', this)">
+                    Shown
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- Password Strength -->
+        <div class="mt-1">
+            <div class="progress">
+                <div id="passwordStrengthBar" class="progress-bar" role="progressbar" style="width:0%"></div>
+            </div>
+            <small id="passwordStrengthText" class="form-text text-muted"></small>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label class="form-label">Confirm Password</label>
+            <div class="input-group">
+                <input type="password" id="ConfirmPassword" name="confirmPassword" class="form-control" />
+                <button type="button" class="btn btn-outline-secondary"
+                        onclick="togglePassword('ConfirmPassword', this)">
+                    Shown
+                </button>
+            </div>
+        </div>
+
+        <!-- reCAPTCHA v2 -->
+        <div class="g-recaptcha" data-sitekey="6Ldz4dErAAAAAIZl9LOYiohJxP8kxZjcv8wLQV-z"></div>
+
+        <button type="submit" class="btn btn-primary mt-4 w-100">Register</button>
+        <a asp-action="Login" class="btn btn-secondary mt-3 w-100">Already have an account? Login</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.textContent = "Hidden";
+            } else {
+                input.type = "password";
+                btn.textContent = "Shown";
+            }
+        }
+
+        function checkPasswordStrength() {
+            const pwd  = document.getElementById("Password").value;
+            const bar  = document.getElementById("passwordStrengthBar");
+            const text = document.getElementById("passwordStrengthText");
+
+            let score = 0;
+            if (pwd.length >= 6) score++;
+            if (/[A-Z]/.test(pwd)) score++;
+            if (/[a-z]/.test(pwd)) score++;
+            if (/\d/.test(pwd)) score++;
+            if (/[\W_]/.test(pwd)) score++;
+
+            const pct = (score / 5) * 100;
+            bar.style.width = pct + "%";
+
+            if (score <= 2) {
+                bar.className = "progress-bar bg-danger";
+                text.textContent = "Weak";
+            } else if (score <= 4) {
+                bar.className = "progress-bar bg-warning";
+                text.textContent = "Medium";
+            } else {
+                bar.className = "progress-bar bg-success";
+                text.textContent = "Strong";
+            }
+        }
+
+        document.getElementById("Password").addEventListener("input", checkPasswordStrength);
+    </script>
+}

@@ -1,0 +1,72 @@
+﻿@model wekdi.Models.Order
+
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<style>
+    /* Full-page center alignment */
+    .order-confirm-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        text-align: center;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .order-title {
+        font-size: 3rem; /* Big headline */
+        font-weight: 700;
+        color: #d32f2f; /* McDonald's red tone */
+        margin-bottom: 1rem;
+    }
+
+    .order-subtitle {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .order-details {
+        font-size: 1.5rem;
+        color: #444;
+        margin-bottom: 2rem;
+    }
+
+    .btn-home {
+        background-color: #ffc300; /* Golden yellow */
+        border: none;
+        color: #000;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        transition: background 0.25s ease;
+        text-decoration: none;
+    }
+
+        .btn-home:hover {
+            background-color: #ffb000;
+            color: #000;
+        }
+</style>
+
+<div class="order-confirm-wrapper">
+    <h1 class="order-title">Order Confirmation</h1>
+
+    <div class="order-subtitle">
+        Thank you! Your order #@Model.OrderId has been placed.
+    </div>
+
+    <div class="order-details">
+        <p><strong>Status:</strong> @Model.Status</p>
+        <p><strong>Total:</strong> @Model.TotalAmount.ToString("C")</p>
+    </div>
+
+    <a asp-controller="Home" asp-action="Index" class="btn-home">
+        Back To Homepage
+    </a>
+</div>

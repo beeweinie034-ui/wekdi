@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyShop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="d-flex flex-column vh-100">
+
+    <!-- Toast container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;"></div>
+
+    <!-- 🌐 Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <a class="navbar-brand">Mekdi</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="cartNotice" class="text-danger fw-bold"></div>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    if (User.IsInRole("Member"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ShoppingCart" asp-action="Index">Shopping Cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="MemberProfile">Profile</a>
+                        </li>
+                    }
+                    else if (User.IsInRole("SuperAdmin") || User.IsInRole("StaffAdmin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="AdminProfile">Profile</a>
+                        </li>
+                    }
+
+                    <!-- Logout (for both Member & Admin) -->
+                    <li class="nav-item">
+                        <form asp-controller="Account"
+                              asp-action="Logout"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <!-- Guest -->
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main role="main" class="flex-grow-1 p-4">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-2">
+        <small>&copy; 2025 Mekdi</small>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+    <!-- ✅ Toast container (top right corner) -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="cartToast"
+             class="toast text-bg-success border-0"
+             role="alert" aria-live="assertive" aria-atomic="true"
+             data-bs-delay="3000">
+            <!-- 3-second auto hide -->
+            <div class="d-flex">
+                <div class="toast-body">
+                    Item added to cart!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.showGlobalAlert = function(message, type) {
+            const container = document.querySelector('.toast-container');
+
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-bg-${type} border-0 shadow-lg`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.setAttribute('data-bs-delay', '3000');
+
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${type === 'success' ? '✅ ' : type === 'danger' ? '⚠️ ' : 'ℹ️ '}
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+
+            container.appendChild(toastEl);
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+
+            toastEl.addEventListener('hidden.bs.toast', () => {
+                toastEl.remove();
+            });
+        };
+    </script>
+
+
+</body>
+
+</html>

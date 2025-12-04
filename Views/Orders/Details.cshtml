@@ -1,0 +1,39 @@
+﻿@model wekdi.Models.Order
+@{
+    Layout = "AdminSidebar";
+    ViewData["Title"] = "Order Details";
+    var items = ViewBag.OrderItems as IEnumerable<wekdi.Models.OrderItem>;
+}
+
+<h2>Order @Model.OrderId</h2>
+
+<p><strong>Member:</strong> @Model.Member?.FullName (@Model.Member?.Email)</p>
+<p><strong>Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+<p><strong>Total:</strong> @Model.TotalAmount.ToString("C")</p>
+
+<h4>Items</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in items)
+        {
+            <tr>
+                <td>@i.Product?.Name</td>
+                <td>@i.Quantity</td>
+                <td>@i.Price.ToString("C")</td>
+                @using System.Globalization
+                <td>@((i.Quantity * i.Price).ToString("C", CultureInfo.GetCultureInfo("ms-MY")))</td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Back to Orders</a>

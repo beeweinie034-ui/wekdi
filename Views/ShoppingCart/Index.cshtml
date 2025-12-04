@@ -1,0 +1,189 @@
+﻿@using wekdi.Models
+@model IEnumerable<Cart>
+
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<!-- === Embedded McDonald's Style CSS === -->
+<style>
+    body {
+        background-color: #fff8f0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    h2 {
+        color: #d32300; /* McDonald's Red */
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-secondary {
+        background-color: #d32300;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.5rem 1.4rem;
+        border-radius: 25px;
+        transition: background-color .2s;
+    }
+
+        .btn-secondary:hover {
+            background-color: #b71c00;
+        }
+
+    .btn-primary {
+        background-color: #ffd100;
+        border: none;
+        color: #000;
+        font-weight: 600;
+        padding: 0.3rem 0.9rem;
+        border-radius: 20px;
+        transition: background-color .2s;
+    }
+
+        .btn-primary:hover {
+            background-color: #e6c400;
+        }
+
+    .btn-danger {
+        background-color: #d32300;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.3rem 0.9rem;
+        border-radius: 20px;
+        transition: background-color .2s;
+    }
+
+        .btn-danger:hover {
+            background-color: #b71c00;
+        }
+
+    table.table {
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        table.table th {
+            background-color: #ffd100;
+            color: #000;
+            font-weight: 600;
+        }
+
+        table.table td {
+            vertical-align: middle;
+        }
+
+    .cart-summary {
+        background-color: #fff3cd;
+        border: 2px solid #ffd100;
+        border-radius: 10px;
+        width: 50%;
+        max-width: 400px;
+        margin-top: 1rem;
+    }
+
+    /* Empty Cart Message */
+    .empty-cart {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #d32300;
+        text-align: center;
+        margin-top: 6rem;
+    }
+</style>
+
+<h2>Your Cart</h2>
+
+<div class="mt-3 mb-4">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        Add More Products
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="empty-cart">Your cart is empty.</p>
+}
+else
+{
+    <table class="table table-sm table-bordered align-middle text-center shadow-sm">
+        <thead>
+            <tr>
+                <th style="width:15%">Product</th>
+                <th style="width:12%">Image</th>
+                <th style="width:12%">Price</th>
+                <th style="width:10%">Qty</th>
+                <th style="width:12%">Subtotal</th>
+                <th style="width:18%">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cart in Model)
+            {
+                <tr>
+                    <td class="text-start">@cart.Product!.Name</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(cart.Product.ImagePath))
+                        {
+                            <img src="~/images/products/@cart.Product.ImagePath"
+                                 alt="@cart.Product.Name"
+                                 class="img-thumbnail"
+                                 style="width:60px; height:60px; object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted small">No image</span>
+                        }
+                    </td>
+                    <td>@cart.Product.Price.ToString("C")</td>
+                    <td>@cart.Quantity</td>
+                    <td>@((cart.Quantity * cart.Product.Price).ToString("C"))</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-1">
+                            <!-- Update form -->
+                            <form asp-action="UpdateQuantity" method="post" class="d-flex align-items-center gap-1">
+                                <input type="hidden" name="cartId" value="@cart.CartId" />
+                                <input type="number" name="quantity"
+                                       value="@cart.Quantity"
+                                       min="1" max="10"
+                                       class="form-control form-control-sm"
+                                       style="width:60px" />
+                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                            </form>
+
+                            <!-- Remove form -->
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="cartId" value="@cart.CartId" />
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">Cart Summary</h4>
+
+    <div class="cart-summary p-3">
+        <div class="d-flex justify-content-between py-1">
+            <strong>Total Products:</strong>
+            <span>@ViewBag.TotalProducts</span>
+        </div>
+        <div class="d-flex justify-content-between py-1">
+            <strong>Total Quantity:</strong>
+            <span>@ViewBag.TotalQuantity</span>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-top mt-2 pt-2">
+            <strong>Grand Total:</strong>
+            <span>@ViewBag.Total.ToString("C")</span>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Checkout" class="btn btn-primary">Checkout</a>
+    </div>
+}

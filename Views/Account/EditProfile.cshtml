@@ -1,0 +1,146 @@
+﻿@model wekdi.Models.Member
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<!-- === Embedded McDonald's Style CSS === -->
+<style>
+    body {
+        background-color: #fff8f0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    h2 {
+        color: #d32300; /* McDonald's red */
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #28a745;
+        color: #fff;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #d32300;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        transition: border-color .2s;
+    }
+
+        .form-control:focus {
+            border-color: #ffd100;
+            box-shadow: 0 0 0 0.2rem rgba(255, 209, 0, 0.3);
+        }
+
+    .btn-primary {
+        background-color: #ffd100;
+        border: none;
+        color: #000;
+        font-weight: 600;
+        padding: 0.5rem 1.4rem;
+        border-radius: 25px;
+        transition: background-color .2s;
+    }
+
+        .btn-primary:hover {
+            background-color: #e6c400;
+        }
+
+    .btn-secondary {
+        background-color: #d32300;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.5rem 1.4rem;
+        border-radius: 25px;
+        margin-left: 0.5rem;
+        transition: background-color .2s;
+    }
+
+        .btn-secondary:hover {
+            background-color: #b71c00;
+        }
+
+    .profile-preview {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #ffd100;
+        margin-bottom: 0.5rem;
+    }
+
+    .text-danger {
+        font-weight: 600;
+    }
+</style>
+
+<h2>Edit Profile</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="EditProfile" enctype="multipart/form-data" method="post" class="col-md-6">
+    <div class="mb-3">
+        <label asp-for="Username" class="form-label">Username</label>
+        <input asp-for="Username" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label">Full Name</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label">Phone</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Address</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Profile Picture</label><br />
+        <img src="@Url.Content(Model.ProfileImagePath ?? "/images/profiles/Default.png")"
+             alt="Profile"
+             class="profile-preview" />
+        <input type="file" name="profileImage" class="form-control mt-2" accept="image/*" />
+        <div class="text-danger">
+            @if (ViewData.ModelState["ProfileImage"] != null)
+            {
+                foreach (var error in ViewData.ModelState["ProfileImage"].Errors)
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="MemberProfile" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

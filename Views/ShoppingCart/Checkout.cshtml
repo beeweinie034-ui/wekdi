@@ -1,0 +1,174 @@
+﻿@model IEnumerable<wekdi.Models.Cart>
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<!-- === Embedded McDonald's Style CSS === -->
+<style>
+    body {
+        background-color: #fff8f0;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    h2 {
+        color: #d32300; /* McDonald's Red */
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    h4 {
+        color: #000;
+        font-weight: 600;
+        margin-top: 1rem;
+    }
+
+    /* Table Styling */
+    table.table {
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        table.table thead {
+            background-color: #ffd100; /* McDonald's Yellow */
+            color: #000;
+            font-weight: 600;
+        }
+
+        table.table td {
+            vertical-align: middle;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #ffd100;
+        border: none;
+        color: #000;
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        transition: background-color .2s;
+    }
+
+        .btn-primary:hover {
+            background-color: #e6c400;
+        }
+
+    /* Order Options */
+    label.form-label.fw-bold {
+        color: #d32300;
+        font-weight: 700 !important;
+    }
+
+    /* Inputs and radio spacing */
+    input[type="radio"] {
+        accent-color: #d32300;
+        margin-right: 0.3rem;
+    }
+
+    /* Table number input */
+    #tableNumberGroup input {
+        border: 2px solid #ffd100;
+        border-radius: 10px;
+    }
+</style>
+
+<h2>Checkout</h2>
+
+<h4 class="mt-3">Order Summary</h4>
+
+<table class="table table-sm table-bordered align-middle shadow-sm">
+    <thead>
+        <tr>
+            <th style="width:40%">Item</th>
+            <th class="text-center" style="width:10%">Qty</th>
+            <th class="text-end" style="width:15%">Price</th>
+            <th class="text-end" style="width:15%">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="d-flex align-items-center">
+                    <img src="~/images/products/@item.Product!.ImagePath"
+                         alt="@item.Product.Name"
+                         class="me-2"
+                         style="width:50px;height:50px;object-fit:cover;border-radius:6px;" />
+                    <span class="text-truncate">@item.Product.Name</span>
+                </td>
+                <td class="text-center">@item.Quantity</td>
+                <td class="text-end">@item.Product.Price.ToString("C")</td>
+                <td class="text-end">@((item.Quantity * item.Product.Price).ToString("C"))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <p><strong>Total Products:</strong> @ViewBag.TotalProducts</p>
+    <p><strong>Total Quantity:</strong> @ViewBag.TotalQuantity</p>
+    <p><strong>Grand Total:</strong> @ViewBag.Total.ToString("C")</p>
+</div>
+
+<hr />
+
+<form asp-action="ProcessCheckout" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+
+    <!-- Order type -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">Order Type</label><br />
+        <input type="radio" name="orderType" value="Takeaway"
+               onclick="toggleOrderOptions()" required /> Takeaway
+        <input type="radio" name="orderType" value="DineIn"
+               class="ms-3" onclick="toggleOrderOptions()" /> Dine In
+    </div>
+
+    <!-- Service method: appears only if Dine In -->
+    <div id="serviceMethodGroup" class="mb-3 d-none">
+        <label class="form-label fw-bold">Service Method</label><br />
+        <input type="radio" name="serviceMethod" value="Counter"
+               onclick="toggleTableNumber()" /> Pick up at Counter
+        <input type="radio" name="serviceMethod" value="TableService"
+               class="ms-3" onclick="toggleTableNumber()" /> Table Service
+    </div>
+
+    <!-- Table number: appears only if Table Service -->
+    <div id="tableNumberGroup" class="mb-3 d-none">
+        <label class="form-label fw-bold">Table Number (1–250)</label>
+        <input type="number" name="tableNumber"
+               class="form-control w-25"
+               min="1" max="250" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Proceed to Payment</button>
+</form>
+
+@section Scripts {
+    <script>
+        function toggleOrderOptions() {
+            const orderType = document.querySelector('input[name="orderType"]:checked')?.value;
+            const serviceGroup = document.getElementById('serviceMethodGroup');
+            const tableGroup = document.getElementById('tableNumberGroup');
+
+            if (orderType === 'DineIn') {
+                serviceGroup.classList.remove('d-none');
+            } else {
+                serviceGroup.classList.add('d-none');
+                tableGroup.classList.add('d-none');
+            }
+        }
+
+        function toggleTableNumber() {
+            const serviceMethod = document.querySelector('input[name="serviceMethod"]:checked')?.value;
+            const tableGroup = document.getElementById('tableNumberGroup');
+
+            if (serviceMethod === 'TableService') {
+                tableGroup.classList.remove('d-none');
+            } else {
+                tableGroup.classList.add('d-none');
+            }
+        }
+    </script>
+}

@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "AdminSidebar";
+    ViewData["Title"] = "Top 3 Best Selling Products";
+}
+
+<h2>Top 3 Best Selling Products</h2>
+<canvas id="topProductsChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.getJSON('/Reports/GetTopProductsData', function (response) {
+            const ctx = document.getElementById('topProductsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar', // or 'pie', 'doughnut'
+                data: {
+                    labels: response.labels,
+                    datasets: [{
+                        label: 'Quantity Sold',
+                        data: response.data,
+                        backgroundColor: ['#007bff', '#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Top 3 Best Selling Products'
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
